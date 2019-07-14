@@ -1,0 +1,374 @@
+# LeetCode 2. Add Two Numbers
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution:
+    def addTwoNumbers(self, l1: ListNode, l2: ListNode) -> ListNode:
+        if l1 is None:
+            return l2
+        if l2 is None:
+            return l1
+            
+        dummy = ListNode(0)
+        p = dummy
+        carry = 0
+        
+        while l1 and l2:
+            p.next = ListNode((l1.val + l2.val + carry) % 10)
+            carry = (l1.val + l2.val + carry) // 10
+            p, l1, l2 = p.next, l1.next, l2.next
+            
+        while l1:
+            p.next = ListNode((l1.val + carry) % 10)
+            carry = (l1.val  + carry) // 10
+            p, l1 = p.next, l1.next
+            
+        while l2:
+            p.next = ListNode((l2.val + carry) % 10)
+            carry = (l2.val  + carry) // 10
+            p, l2 = p.next, l2.next
+            
+        if carry == 1:
+            p.next = ListNode(1)
+            
+        return dummy.next
+
+
+# LeetCode 3. Longest Substring Without Repeating Characters
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        m = dict()
+        res = 0
+        left = -1 
+        for i in range(len(s)):
+            if s[i] in m and m[s[i]]>left:
+                left = m[s[i]]
+            m[s[i]] = i
+            res = max(res,i-left)
+        return res
+
+# LeetCode 5. Longest Palindromic Substring
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        # write your code here
+        if not s: # None or ""
+            return ""
+            
+        start, longest = 0, 0
+        for middle in range(len(s)):
+            start_tmp, length = self.length_of_palindrome(s, middle - 1, middle + 1)
+            if length > longest:
+                start = start_tmp
+                longest = length
+            
+            start_tmp, length = self.length_of_palindrome(s, middle, middle + 1)
+            if length > longest:
+                start = start_tmp
+                longest = length
+        
+        return s[start: start + longest]
+            
+    def length_of_palindrome(self, s, left, right):
+        while left >= 0 and right < len(s) and s[left] == s[right]:
+            left -= 1 
+            right += 1 
+        
+        return left + 1, right - left - 1
+
+
+# LeetCode 6. ZigZag Conversion
+class Solution:
+    def convert(self, s: str, numRows: int) -> str:
+        if numRows == 1 or numRows >= len(s):
+            return s
+        
+        ans = ['' for x in range(numRows)]
+        row, step = 0, 1
+        
+        for ch in s:
+            ans[row] += ch
+            
+            if row == 0:
+                step = 1
+            elif row == numRows - 1:
+                step = -1
+                
+            row += step
+        
+        return ''.join(ans)
+        
+        
+# LeetCode 8. String to Integer (atoi)
+class Solution:
+    def myAtoi(self, str: str) -> int:
+        stripX = str.strip()
+        
+        if stripX == "" or stripX == "+" or stripX == "-":
+            return 0
+       
+        s1 = re.match('[^\d]+', (stripX.lstrip("-").lstrip("+")))
+        
+        if s1 != None:
+            return 0
+        else:
+            s1 =re.search('\-*\+*\d+', stripX).group()
+            
+        if s1[0:2] == "--" or s1[0:2] == "-+" or s1[0:2] == "++":
+            return 0
+        
+        result = int(s1)
+        
+        if result > 0:
+            return 2**31 - 1 if result > 2**31 - 1 else result
+        else:
+            return -2**31 if result < -2**31 else result
+  
+
+# LeetCode 11. Container With Most Water
+class Solution:
+    def maxArea(self, height: List[int]) -> int:
+        left, right = 0, len(height) - 1
+        ans = 0
+        
+        while left < right:
+            if height[left] < height[right]:
+                area = height[left] * (right - left)
+                left += 1
+            else:
+                area = height[right] * (right - left)
+                right -= 1
+            ans = max(ans, area) 
+            
+        return ans
+
+
+# LeetCode 12. Integer to Roman
+class Solution:
+    def intToRoman(self, num: int) -> str:
+        ans = ""; 
+        values = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1]; 
+        roman = ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"]; 
+        for i in range(0, len(values)):
+            while(num >= values[i]):
+                num = num - values[i];
+                ans = ans + roman[i];
+
+        return ans
+        
+  
+# LeetCode 15. 3Sum
+class Solution:
+    def threeSum(self, nums: List[int]) -> List[List[int]]:
+        result = []
+        
+        nums = sorted(nums)
+        
+        for i in range(len(nums)):
+            if (i != 0 and nums[i] != nums[i - 1]) or i == 0:
+                
+                left = i + 1
+                right = len(nums) - 1
+                
+                while left < right:
+                    s = nums[i] + nums[left] + nums[right] 
+                    if s == 0:
+                        result.append([nums[i], nums[left], nums[right]])
+                        left += 1
+                        while left < right and nums[left] == nums[left - 1]:
+                            left += 1
+                            
+                    if s < 0:
+                        left += 1
+                    else:
+                        right -= 1
+                        
+        return result
+     
+
+# LeetCode 16. 3Sum Closest
+class Solution:
+    def threeSumClosest(self, nums: List[int], target: int) -> int:
+        nums = sorted(nums)
+        ans = sys.maxsize
+
+        for pivot in range(len(nums)):
+            left, right = pivot+1, len(nums)-1
+            while left < right:
+                s = nums[pivot] + nums[left] + nums[right]
+                if abs(s - target) < abs(ans - target):
+                    ans = s
+                if s > target:
+                    right -= 1
+                elif s < target:
+                    left += 1
+                else:
+                    return s
+        return ans
+
+
+# LeetCode 17. Letter Combinations of a Phone Number
+class Solution:
+    def letterCombinations(self, digits: str) -> List[str]:
+        if digits == "": 
+            return []
+        
+        digitDict = {
+            0: '0',
+            1: '1',
+            2: 'abc',
+            3: 'def',
+            4: 'ghi',
+            5: 'jkl',
+            6: 'mno',
+            7: 'pqrs',
+            8: 'tuv',
+            9: 'wxyz'
+        }
+        
+        result =[""]
+        
+        for digit in digits:
+            tmp_list = []
+            for ch in digitDict[int(digit)]:
+                for str in result:
+                    tmp_list.append(str + ch)
+            result = tmp_list
+        
+        return result
+
+
+# LeetCode 18. 4Sum
+class Solution:
+    def fourSum(self, nums: List[int], target: int) -> List[List[int]]:
+        nums = sorted(nums)
+        result = []
+        
+        for i in range(len(nums)):
+            if i != 0 and nums[i] == nums[i-1]:
+                continue
+            for j in range(i+1, len(nums)):
+                if j != i+1 and nums[j] == nums[j-1]:
+                    continue
+                left, right = j+1, len(nums) - 1
+                while left < right:
+                    q_sum = nums[i] + nums[j] + nums[left] + nums[right]
+                    if q_sum == target:
+                        result.append([nums[i], nums[j], nums[left], nums[right]])
+                        left += 1
+                        right -= 1
+                        while left < right and nums[left] == nums[left-1]:
+                            left += 1
+                        while left < right and nums[left] == nums[right+1]:
+                            right -= 1
+                    elif q_sum < target:
+                        left += 1
+                    else:
+                        right -= 1
+            
+        return result
+
+
+# LeetCode 19. Remove Nth Node From End of List
+class Solution:
+    def removeNthFromEnd(self, head: ListNode, n: int) -> ListNode:
+        if not head or n == 0:
+            return head
+        dummy = ListNode(0)
+        dummy.next = head
+        slow, fast = dummy, dummy
+        for i in range(n):
+            fast = fast.next
+        while fast.next != None:
+            fast = fast.next
+            slow = slow.next
+        
+        slow.next = slow.next.next
+        
+        return dummy.next
+        
+        
+# LeetCode 22. Generate Parentheses 
+class Solution:
+    def generateParenthesis(self, n: int) -> List[str]:
+        if n == 0:
+            return []
+        
+        ans = []
+        self.back_track(n, n, '', ans)
+        return ans
+    
+    def back_track(self, l, r, item, ans):
+        if r < l:
+            return
+        if l == 0 and r == 0:
+            ans.append(item)
+        if l > 0:
+            self.back_track(l-1, r, item + '(', ans)
+        if r > 0:
+            self.back_track(l, r-1, item + ')', ans)
+            
+            
+# LeetCode 24. Swap Nodes in Pairs  
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution:
+    def swapPairs(self, head: ListNode) -> ListNode:
+        if head == None or head.next == None:
+            return head
+            
+        dummy = ListNode(0)
+        dummy.next = head
+        
+        current = dummy
+        while current.next and current.next.next:
+            tmp = current.next.next
+            current.next.next = tmp.next
+            tmp.next = current.next
+            current.next = tmp
+            current = current.next.next
+        return dummy.next
+        
+        
+# LeetCode 29. Divide Two Integers 
+class Solution:
+    def divide(self, dividend: int, divisor: int) -> int:
+        if abs(dividend) < abs(divisor):
+            return 0
+        if dividend == 0:
+            return 0 
+        if divisor == 0:
+            return None
+        
+        is_negative = False
+        if dividend < 0 and divisor > 0:
+            is_negative = True
+        if dividend > 0 and divisor < 0:
+            is_negative = True
+        
+        dividend = abs(dividend)
+        divisor = abs(divisor)
+        
+        
+        ans = 0
+        while divisor <= dividend:
+            curr_val = divisor
+            count = 1 
+            while curr_val + curr_val < dividend:
+                curr_val += curr_val 
+                count += count
+            dividend -= curr_val
+            ans += count
+
+        if is_negative:
+            ans = - ans
+            
+        if ans > 2147483647:
+            ans = 2147483647
+        return ans
