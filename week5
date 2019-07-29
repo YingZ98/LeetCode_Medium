@@ -1,0 +1,26 @@
+# 55. Jump Game
+""
+从后往前遍历
+如果跳不到i点，那么一定跳不到i后面的点。
+""
+class Solution:
+    def canJump(self, nums: List[int]) -> bool:
+        lastpos = len(nums) - 1
+        for i in range(len(nums) - 1, -1, -1):
+            if nums[i] + i >= lastpos:
+                lastpos = i
+        return lastpos == 0
+        
+        
+# 56. Merge Intervals
+class Solution:
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        res = []
+        for interval in sorted(intervals):
+            if not res or interval[0] > res[-1][-1]:
+                res.append(interval)
+            else:
+                res[-1][-1] = max(interval[-1], res[-1][-1])
+        return res
+        
+ 
