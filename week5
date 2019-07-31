@@ -34,3 +34,29 @@ class Solution:
         return dp[-1]
 
 # 73. Set Matrix Zeroes
+
+
+# 75. Sort Colors
+class Solution:
+    def sortColors(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        first = 0
+        last = len(nums) - 1
+        while first < len(nums) and nums[first] == 0:
+            first += 1
+        while last >= 0 and nums[last] == 2:
+            last -= 1
+        
+        index = first
+        while index <= last:
+            if nums[index] == 1:
+                index += 1
+            elif nums[index] == 0:
+                nums[index], nums[first] =  nums[first], nums[index]
+                index += 1
+                first += 1
+            elif nums[index] == 2:
+                nums[index], nums[last] =  nums[last], nums[index]
+                last -= 1
